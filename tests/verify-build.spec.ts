@@ -1,8 +1,9 @@
-import { test, expect } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import { pom } from '../dist/index.mjs'
 
-test.describe('Verify Build Outputs (MJS & CJS)', () => {
-  test('MJS: should export pom correctly', async () => {
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: describe block with multiple tests
+test.describe('Verify Build Outputs: MJS', () => {
+  test('MJS: should export pom correctly', () => {
     expect(pom).toBeDefined()
     expect(pom.page).toBeDefined()
     expect(pom.button).toBeDefined()
@@ -13,21 +14,6 @@ test.describe('Verify Build Outputs (MJS & CJS)', () => {
     expect(pom.and).toBeDefined()
     expect(pom.or).toBeDefined()
   })
-
-  test('CJS: should export pom correctly', async () => {
-    const mod = await import('../dist/index.cjs')
-    const pomCjs = mod.pom
-    expect(pomCjs).toBeDefined()
-    expect(pomCjs.page).toBeDefined()
-    expect(pomCjs.button).toBeDefined()
-    expect(pomCjs.text).toBeDefined()
-    expect(pomCjs.from).toBeDefined()
-    expect(pomCjs.within).toBeDefined()
-    expect(pomCjs.when).toBeDefined()
-    expect(pomCjs.and).toBeDefined()
-    expect(pomCjs.or).toBeDefined()
-  })
-
   test('MJS: can create a page definition', async ({ page }) => {
     const pageDef = pom.page({
       submit: pom.button({ name: 'Submit' }),
@@ -40,41 +26,11 @@ test.describe('Verify Build Outputs (MJS & CJS)', () => {
     expect(model.submit).toBeDefined()
   })
 
-  test('CJS: can create a page definition', async ({ page }) => {
-    const mod = await import('../dist/index.cjs')
-    const pomCjs = mod.pom
-
-    const pageDef = pomCjs.page({
-      submit: pomCjs.button({ name: 'Submit' }),
-    })
-
-    expect(pageDef).toBeDefined()
-    expect(pageDef.bind).toBeDefined()
-
-    const model = await pageDef.bind(page)
-    expect(model.submit).toBeDefined()
-  })
-
   test('MJS: pom.text() works', async ({ page }) => {
-    await page.setContent(`<span>Hello</span>`)
+    await page.setContent('<span>Hello</span>')
 
     const pageDef = pom.page({
       hello: pom.text('Hello'),
-    })
-
-    const model = await pageDef.bind(page)
-    const text = await model.hello.textContent()
-    expect(text).toBe('Hello')
-  })
-
-  test('CJS: pom.text() works', async ({ page }) => {
-    const mod = await import('../dist/index.cjs')
-    const pomCjs = mod.pom
-
-    await page.setContent(`<span>Hello</span>`)
-
-    const pageDef = pomCjs.page({
-      hello: pomCjs.text('Hello'),
     })
 
     const model = await pageDef.bind(page)
@@ -92,31 +48,8 @@ test.describe('Verify Build Outputs (MJS & CJS)', () => {
 
     const pageDef = pom.page({
       form: pom.group({
-        username: pom.textbox({ label: 'Username' }),
         submit: pom.button({ name: 'Submit' }),
-      }),
-    })
-
-    const model = await pageDef.bind(page)
-    await model.form.username.fill('user')
-    await model.form.submit.click()
-  })
-
-  test('CJS: pom.group() works', async ({ page }) => {
-    const mod = await import('../dist/index.cjs')
-    const pomCjs = mod.pom
-
-    await page.setContent(`
-      <div>
-        <input aria-label="Username" />
-        <button name="Submit">Submit</button>
-      </div>
-    `)
-
-    const pageDef = pomCjs.page({
-      form: pomCjs.group({
-        username: pomCjs.textbox({ label: 'Username' }),
-        submit: pomCjs.button({ name: 'Submit' }),
+        username: pom.textbox({ label: 'Username' }),
       }),
     })
 
@@ -139,7 +72,74 @@ test.describe('Verify Build Outputs (MJS & CJS)', () => {
     expect(model['navigation']).toBeDefined()
     expect(model['navigation']['Next']).toBeDefined()
   })
+})
 
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: describe block with multiple tests
+test.describe('Verify Build Outputs: CJS', () => {
+  test('CJS: should export pom correctly', async () => {
+    const mod = await import('../dist/index.cjs')
+    const pomCjs = mod.pom
+    expect(pomCjs).toBeDefined()
+    expect(pomCjs.page).toBeDefined()
+    expect(pomCjs.button).toBeDefined()
+    expect(pomCjs.text).toBeDefined()
+    expect(pomCjs.from).toBeDefined()
+    expect(pomCjs.within).toBeDefined()
+    expect(pomCjs.when).toBeDefined()
+    expect(pomCjs.and).toBeDefined()
+    expect(pomCjs.or).toBeDefined()
+  })
+  test('CJS: can create a page definition', async ({ page }) => {
+    const mod = await import('../dist/index.cjs')
+    const pomCjs = mod.pom
+
+    const pageDef = pomCjs.page({
+      submit: pomCjs.button({ name: 'Submit' }),
+    })
+
+    expect(pageDef).toBeDefined()
+    expect(pageDef.bind).toBeDefined()
+
+    const model = await pageDef.bind(page)
+    expect(model.submit).toBeDefined()
+  })
+  test('CJS: pom.text() works', async ({ page }) => {
+    const mod = await import('../dist/index.cjs')
+    const pomCjs = mod.pom
+
+    await page.setContent('<span>Hello</span>')
+
+    const pageDef = pomCjs.page({
+      hello: pomCjs.text('Hello'),
+    })
+
+    const model = await pageDef.bind(page)
+    const text = await model.hello.textContent()
+    expect(text).toBe('Hello')
+  })
+
+  test('CJS: pom.group() works', async ({ page }) => {
+    const mod = await import('../dist/index.cjs')
+    const pomCjs = mod.pom
+
+    await page.setContent(`
+      <div>
+        <input aria-label="Username" />
+        <button name="Submit">Submit</button>
+      </div>
+    `)
+
+    const pageDef = pomCjs.page({
+      form: pomCjs.group({
+        submit: pomCjs.button({ name: 'Submit' }),
+        username: pomCjs.textbox({ label: 'Username' }),
+      }),
+    })
+
+    const model = await pageDef.bind(page)
+    await model.form.username.fill('user')
+    await model.form.submit.click()
+  })
   test('CJS: pom.from() with ariaSnapshot', async ({ page }) => {
     const mod = await import('../dist/index.cjs')
     const pomCjs = mod.pom
