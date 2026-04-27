@@ -1,0 +1,47 @@
+{
+  "description": "Zod-style POM library for Playwright",
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.13",
+    "@commitlint/cli": "^20.5.2",
+    "@commitlint/config-conventional": "^20.5.0",
+    "@playwright/test": "^1.59.1",
+    "@types/node": "^25.6.0",
+    "husky": "^9.1.7",
+    "playwright": "^1.59.0",
+    "tsdown": "^0.21.10",
+    "typescript": "^6.0.0",
+    "zod": "^3.0.0"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "keywords": [
+    "playwright",
+    "pom",
+    "page-object",
+    "e2e",
+    "testing"
+  ],
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "name": "@pom/pom",
+  "peerDependencies": {
+    "@playwright/test": "^1.59.0"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "prepare": "husky",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "typecheck": "tsc --noEmit"
+  },
+  "type": "module",
+  "types": "./dist/index.d.ts",
+  "version": "1.0.0"
+}
