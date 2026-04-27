@@ -27,7 +27,7 @@
     "testing"
   ],
   "license": "MIT",
-  "main": "./dist/index.js",
+  "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
   "name": "@pom/pom",
   "peerDependencies": {

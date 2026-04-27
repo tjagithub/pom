@@ -10,6 +10,8 @@
 	},
 	"editor.codeActionsOnSave": {
 		"source.organizeImports": "explicit",
-		"source.biome": "explicit"
+		"source.biome": "explicit",
+		"source.fixAll.biome": "explicit",
+		"source.removeUnused.ts": "explicit"
 	}
 }
