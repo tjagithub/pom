@@ -30,7 +30,7 @@ test.describe('Verify Build Outputs: MJS', () => {
     await page.setContent('<span>Hello</span>')
 
     const pageDef = pom.page({
-      hello: pom.text('Hello'),
+      hello: pom.text({ text: 'Hello' }),
     })
 
     const model = await pageDef.bind(page)
@@ -110,7 +110,7 @@ test.describe('Verify Build Outputs: CJS', () => {
     await page.setContent('<span>Hello</span>')
 
     const pageDef = pomCjs.page({
-      hello: pomCjs.text('Hello'),
+      hello: pomCjs.text({ text: 'Hello' }),
     })
 
     const model = await pageDef.bind(page)

@@ -3,7 +3,7 @@ import { pom } from '../src/index'
 
 // Reusable handler for newsletter dialog
 const dismissNewsletter = pom
-  .when(pom.text('Sign up to the newsletter'))
+  .when(pom.text({ text: 'Sign up to the newsletter' }))
   .do(pom.click(pom.button({ name: 'No thanks' })))
 
 test.describe('POM API - Core Functionality', () => {
@@ -94,7 +94,7 @@ test.describe('POM API - Core Functionality', () => {
     await page.setContent(`<p>Hello World</p>`)
 
     const pageDef = pom.page({
-      greeting: pom.text('Hello World'),
+      greeting: pom.text({ text: 'Hello World' }),
     })
 
     const model = await pageDef.bind(page)
@@ -137,7 +137,7 @@ test.describe('POM API - Handler (when/do)', () => {
     `)
 
     const dismissHandler = pom
-      .when(pom.text('Sign up to the newsletter'))
+      .when(pom.text({ text: 'Sign up to the newsletter' }))
       .do(pom.click(pom.button({ name: 'No thanks' })))
 
     const pageDef = pom.page({
@@ -159,7 +159,7 @@ test.describe('POM API - Handler (when/do)', () => {
 
   test('handler reuse across multiple pages', async ({ page }) => {
     const dismissNewsletter = pom
-      .when(pom.text('Sign up'))
+      .when(pom.text({ text: 'Sign up' }))
       .do(pom.click(pom.button({ name: 'Close' })))
 
     const pageDef1 = pom.page({

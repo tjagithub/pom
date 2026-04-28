@@ -28,7 +28,7 @@ test.describe('POM Typed API - Options Support', () => {
 
     const pageDef = pom.page({
       helloText: pom.text({ text: 'Hello', exact: true }),
-      helloWorld: pom.text('Hello World'),
+      helloWorld: pom.text({ text: 'Hello World' }),
     })
 
     const model = await pageDef.bind(page)

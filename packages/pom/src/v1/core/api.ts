@@ -12,6 +12,23 @@ type GetByRoleType = Parameters<Page['getByRole']>[0]
 type GetByRoleOptions = Parameters<Page['getByRole']>[1]
 type LocatorOptions = Parameters<Page['locator']>[1]
 
+// Valid ARIA roles for type safety
+const ARIA_ROLES = [
+  'button', 'textbox', 'checkbox', 'radio', 'link', 'combobox', 'menu', 'menuitem',
+  'grid', 'row', 'cell', 'columnheader', 'rowheader', 'table', 'dialog', 'alert',
+  'alertdialog', 'application', 'article', 'banner', 'blockquote', 'caption', 'code',
+  'complementary', 'contentinfo', 'definition', 'deletion', 'directory', 'document',
+  'emphasis', 'feed', 'figure', 'form', 'generic', 'gridcell', 'group', 'heading',
+  'img', 'insertion', 'list', 'listbox', 'listitem', 'log', 'main', 'marquee', 'math',
+  'meter', 'menubar', 'menuitemcheckbox', 'menuitemradio', 'navigation', 'none',
+  'note', 'option', 'paragraph', 'presentation', 'progressbar', 'radiogroup', 'region',
+  'rowgroup', 'scrollbar', 'search', 'searchbox', 'separator', 'slider', 'spinbutton',
+  'status', 'strong', 'subscript', 'superscript', 'switch', 'tab', 'tablist',
+  'tabpanel', 'term', 'time', 'timer', 'toolbar', 'tooltip', 'tree', 'treegrid', 'treeitem'
+] as const
+
+type ValidAriaRole = typeof ARIA_ROLES[number]
+
 // Element config that supports multiple locator strategies
 export type ElementConfig = {
   name?: string | RegExp
@@ -31,7 +48,7 @@ function toConfig(params: ElementConfig | string | undefined): ElementConfig {
 }
 
 // Helper to create element Def that supports multiple locator strategies
-function elemDef(role: string, params?: ElementConfig | string): Def<Locator> {
+function elemDef(role: ValidAriaRole, params?: ElementConfig | string): Def<Locator> {
   const config = toConfig(params)
   return (ctx: Ctx) => {
     // CSS selector - pass options if provided
@@ -152,10 +169,7 @@ export const pom = {
   treeitem: (params?: POMParams | string): Def<Locator> => elemDef('treeitem', params),
 
   // === New Factories ===
-  text(config: string | { text: string; exact?: boolean }): Def<Locator> {
-    if (typeof config === 'string') {
-      return (ctx: Ctx) => ctx.getByText(config)
-    }
+  text(config: { text: string; exact?: boolean }): Def<Locator> {
     const { text, exact } = config
     const opts = exact !== undefined ? { exact } : undefined
     return (ctx: Ctx) => ctx.getByText(text, opts)
@@ -194,10 +208,7 @@ export const pom = {
   within(parent: Def<Locator>, child: Def<Locator>): Def<Locator> {
     return (ctx: Ctx) => {
       const parentLoc = parent(ctx)
-      const childLoc = child(ctx)
-      // We want the child element, but scoped to the parent.
-      // The child locator must be resolved with parent as context.
-      // Since child is (ctx: Ctx) => Locator, we pass parentLoc as ctx.
+      // Child gets parent as context for scoping
       return child(parentLoc)
     }
   },
@@ -263,35 +274,39 @@ export const pom = {
 
   // === From ARIA Snapshot ===
   from(snapshot: string): Record<string, Def<any>> {
-    const lines = snapshot.split('\n')
-    const root: AriaNode = { role: 'root', children: [], indent: -1 }
+    try {
+      const lines = snapshot.split('\n')
+      const root: AriaNode = { role: 'root', children: [], indent: -1 }
 
-    for (const line of lines) {
-      if (!line.trim()) continue
-      const indent = line.search(/\S/)
-      const node = parseAriaLine(line.trim())
+      for (const line of lines) {
+        if (!line.trim()) continue
+        const indent = line.search(/\S/)
+        const node = parseAriaLine(line.trim())
 
-      // Find parent: walk up to find node with indent < current indent
-      let parent = root
-      for (let i = root.children.length - 1; i >= 0; i--) {
-        const candidate = root.children[i]
-        if (candidate.indent < indent) {
-          parent = candidate
-          break
+        // Find parent: walk up to find node with indent < current indent
+        let parent = root
+        for (let i = root.children.length - 1; i >= 0; i--) {
+          const candidate = root.children[i]
+          if (candidate.indent < indent) {
+            parent = candidate
+            break
+          }
         }
+
+        node.indent = indent
+        parent.children.push(node)
       }
 
-      node.indent = indent
-      parent.children.push(node)
+      // Remove the root wrapper, return top-level children as record
+      const result: Record<string, Def<any>> = {}
+      for (const child of root.children) {
+        const key = child.name || child.role
+        result[key] = fromAriaNode(child)
+      }
+      return result
+    } catch (error) {
+      throw new Error(`Failed to parse ARIA snapshot: ${error instanceof Error ? error.message : String(error)}`)
     }
-
-    // Remove the root wrapper, return top-level children as record
-    const result: Record<string, Def<any>> = {}
-    for (const child of root.children) {
-      const key = child.name || child.role
-      result[key] = fromAriaNode(child)
-    }
-    return result
   },
 }
 
@@ -370,9 +385,9 @@ function fromAriaNode(node: AriaNode): Def<any> {
     case 'contentinfo':
       return pom.contentinfo({ name: node.name || '' })
     case 'text':
-      return pom.text(node.text || node.name || '')
+      return pom.text({ text: node.text || node.name || '' })
     default:
-      if (node.name) return pom.text(node.name)
+      if (node.name) return pom.text({ text: node.name })
       return pom.locator(`[role="${node.role}"]`)
   }
 }
