@@ -13,7 +13,7 @@
     "zod": "^3.0.0"
   },
   "author": "TJ Appleby",
-  "bugs": "https://github.com/tjagithub/pom/issues",
+  "bugs": "https://github.com/tjagithub/pompom/issues",
   "exports": {
     ".": {
       "import": {
@@ -31,7 +31,7 @@
     "README.md",
     "LICENSE"
   ],
-  "homepage": "https://github.com/tjagithub/pom#readme",
+  "homepage": "https://github.com/tjagithub/pompom#readme",
   "keywords": [
     "playwright",
     "pom",
@@ -45,7 +45,7 @@
   "name": "pompom",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tjagithub/pom.git"
+    "url": "git+https://github.com/tjagithub/pompom.git"
   },
   "peerDependencies": {
     "@playwright/test": "^1.59.0"
