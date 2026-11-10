@@ -1,13 +1,15 @@
-# POM - Zod-Style Page Object Model for Playwright
+# pompom
+
+POM, twice: a Zod-style Page Object Model for Playwright.
 
 A TypeScript library that mimics Zod's API to generate Page Object Models (POMs) for `@playwright/test`. Define your page elements once and get type-safe locators with a clean, chainable API.
 
 ## Installation
 
 ```bash
-npm install @pom/pom
+npm install pompom
 # or
-yarn add @pom/pom
+yarn add pompom
 ```
 
 Peer dependencies (installed automatically with npm 7+):
@@ -18,7 +20,7 @@ Peer dependencies (installed automatically with npm 7+):
 POM uses a **descriptor pattern** where element factories return `Def<Locator>` functions that resolve to Playwright locators when bound to a page.
 
 ```typescript
-import { pom } from '@pom/pom'
+import { pom } from 'pompom'
 
 // 1. Define your page structure
 const loginPage = pom.page({
@@ -242,7 +244,7 @@ const result = pom.from(snapshot)
 
 ```typescript
 import { test, expect } from '@playwright/test'
-import { pom } from '@pom/pom'
+import { pom } from 'pompom'
 
 test('login page', async ({ page }) => {
   // Define page structure

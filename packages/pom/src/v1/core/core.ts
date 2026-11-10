@@ -1,4 +1,4 @@
-import type { Locator, Page } from 'playwright/test'
+import type { Locator, Page } from '@playwright/test'
 
 // Context for resolving descriptors: top-level is Page, nested is parent Locator
 export type Ctx = Page | Locator
