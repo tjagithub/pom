@@ -1,0 +1,17 @@
+[tools]
+node = "26.13.0"
+hk = "2.11.1"
+pkl = "0.33.0"
+
+[tasks.build]
+run = "npm run build"
+
+[tasks.typecheck]
+run = "npm run typecheck"
+
+[tasks.test]
+depends = ["build"]
+run = "npx playwright test"
+
+[tasks.check]
+depends = ["typecheck", "test"]

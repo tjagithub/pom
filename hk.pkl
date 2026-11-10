@@ -1,0 +1,21 @@
+amends "package://github.com/jdx/hk/releases/download/v2.11.1/hk@2.11.1#/Config.pkl"
+
+local checks = new Mapping<String, Step> {
+    ["typecheck"] {
+        glob = List("**/*.ts")
+        check = "npm run typecheck"
+    }
+    ["test"] {
+        glob = List("**/*.ts", "package.json")
+        check = "npm run build && npx playwright test"
+    }
+}
+
+hooks {
+    ["pre-commit"] {
+        steps = checks
+    }
+    ["check"] {
+        steps = checks
+    }
+}

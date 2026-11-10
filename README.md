@@ -312,6 +312,8 @@ npm run test
 npm run test:ui
 ```
 
+Tooling is pinned in `mise.toml`. With [mise](https://mise.jdx.dev) installed, `mise install` sets up Node, hk and pkl, `mise run check` runs the typecheck and tests, and `hk install` adds the pre-commit hook.
+
 ## Key Differences from Traditional POM
 
 | Traditional POM | POM Library |

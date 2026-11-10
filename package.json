@@ -2,11 +2,8 @@
   "description": "Zod-style POM library for Playwright",
   "devDependencies": {
     "@biomejs/biome": "^2.4.13",
-    "@commitlint/cli": "^20.5.2",
-    "@commitlint/config-conventional": "^20.5.0",
     "@playwright/test": "^1.65.0",
     "@types/node": "^25.6.0",
-    "husky": "^9.1.7",
     "playwright": "^1.65.0",
     "tsdown": "^0.21.10",
     "typescript": "^6.0.0",
@@ -53,7 +50,6 @@
   "scripts": {
     "build": "tsdown",
     "dev": "tsdown --watch",
-    "prepare": "husky",
     "prepublishOnly": "npm run build",
     "test": "playwright test",
     "test:ui": "playwright test --ui",
@@ -61,7 +57,7 @@
   },
   "type": "module",
   "types": "./dist/index.d.mts",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "dependencies": {
     "yaml": "^2.9.1"
   }
