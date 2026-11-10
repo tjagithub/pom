@@ -15,7 +15,8 @@ test.describe('POM.within() with pom.form()', () => {
     const formCount = await page.getByRole('form', { name: 'login' }).count()
     console.log('Form count:', formCount)
 
-    const submitInFormCount = await page.getByRole('form', { name: 'login' })
+    const submitInFormCount = await page
+      .getByRole('form', { name: 'login' })
       .filter({ has: page.getByRole('button', { name: 'submit' }) })
       .count()
     console.log('Submit in form count (native):', submitInFormCount)
@@ -23,7 +24,7 @@ test.describe('POM.within() with pom.form()', () => {
     const pageDef = pom.page({
       submitInForm: pom.within(
         pom.form({ name: 'login' }),
-        pom.button({ name: 'submit' })
+        pom.button({ name: 'submit' }),
       ),
     })
 
@@ -51,15 +52,15 @@ test.describe('POM.within() with pom.form()', () => {
       loginForm: pom.group({
         username: pom.within(
           pom.form({ name: 'login' }),
-          pom.textbox({ label: 'username' })
+          pom.textbox({ label: 'username' }),
         ),
         password: pom.within(
           pom.form({ name: 'login' }),
-          pom.textbox({ label: 'password' })
+          pom.textbox({ label: 'password' }),
         ),
         submit: pom.within(
           pom.form({ name: 'login' }),
-          pom.button({ name: 'submit' })
+          pom.button({ name: 'submit' }),
         ),
       }),
     })
@@ -82,7 +83,7 @@ test.describe('POM.within() with pom.form()', () => {
     const pageDef = pom.page({
       submitInSection: pom.within(
         pom.locator('#login'),
-        pom.button({ name: 'submit' })
+        pom.button({ name: 'submit' }),
       ),
     })
 

@@ -31,10 +31,12 @@ function parseItem(item: unknown): AriaNode | undefined {
   if (!item || typeof item !== 'object') return undefined
   const [key, value] = Object.entries(item)[0] ?? []
   if (key === undefined || key.startsWith('/')) return undefined // `/url`, `/placeholder`: not elements
-  if (key === 'text') return { role: 'text', text: String(value ?? ''), attrs: {}, children: [] }
+  if (key === 'text')
+    return { role: 'text', text: String(value ?? ''), attrs: {}, children: [] }
   const node = parseKey(key)
   if (!node) return undefined
-  if (Array.isArray(value)) node.children = value.map(parseItem).filter((n): n is AriaNode => !!n)
+  if (Array.isArray(value))
+    node.children = value.map(parseItem).filter((n): n is AriaNode => !!n)
   else if (value != null) node.text = String(value)
   return node
 }
@@ -48,7 +50,14 @@ export function parseAria(snapshot: string): AriaNode[] {
 
 const MAX_KEY = 40
 const keyOf = (n: AriaNode): string => {
-  const base = typeof n.name === 'string' ? n.name : n.name ? String(n.name) : n.role === 'text' ? 'text' : n.role
+  const base =
+    typeof n.name === 'string'
+      ? n.name
+      : n.name
+        ? String(n.name)
+        : n.role === 'text'
+          ? 'text'
+          : n.role
   return base.length > MAX_KEY ? `${base.slice(0, MAX_KEY - 1)}…` : base
 }
 
@@ -65,8 +74,21 @@ export interface Factories {
 
 // Sibling keys are made unique (`More`, `More 2`) and repeated role+name pairs get `.nth(i)`.
 const INTERACTIVE = new Set([
-  'button', 'link', 'textbox', 'searchbox', 'checkbox', 'radio', 'combobox', 'option', 'tab',
-  'menuitem', 'menuitemcheckbox', 'menuitemradio', 'switch', 'slider', 'spinbutton',
+  'button',
+  'link',
+  'textbox',
+  'searchbox',
+  'checkbox',
+  'radio',
+  'combobox',
+  'option',
+  'tab',
+  'menuitem',
+  'menuitemcheckbox',
+  'menuitemradio',
+  'switch',
+  'slider',
+  'spinbutton',
 ])
 
 // Interactive roles claim a plain name first; others on a clash get the role added (`Sign in heading`).
@@ -74,11 +96,17 @@ function assignKeys(nodes: AriaNode[]): string[] {
   const count = new Map<string, number>()
   const owner = new Map<string, string>()
   const out: string[] = []
-  const order = nodes.map((_, i) => i).sort((a, b) => +!INTERACTIVE.has(nodes[a].role) - +!INTERACTIVE.has(nodes[b].role))
+  const order = nodes
+    .map((_, i) => i)
+    .sort(
+      (a, b) =>
+        +!INTERACTIVE.has(nodes[a].role) - +!INTERACTIVE.has(nodes[b].role),
+    )
   for (const i of order) {
     const n = nodes[i]
     let base = keyOf(n)
-    if (owner.has(base) && owner.get(base) !== n.role) base = `${base} ${n.role}`
+    if (owner.has(base) && owner.get(base) !== n.role)
+      base = `${base} ${n.role}`
     else owner.set(base, n.role)
     const seen = (count.get(base) ?? 0) + 1
     count.set(base, seen)
@@ -87,7 +115,11 @@ function assignKeys(nodes: AriaNode[]): string[] {
   return out
 }
 
-export function buildShape(all: AriaNode[], f: Factories, nested = false): Record<string, Def> {
+export function buildShape(
+  all: AriaNode[],
+  f: Factories,
+  nested = false,
+): Record<string, Def> {
   const nodes = nested ? all.filter((n) => n.role !== 'text') : all
   const keys = assignKeys(nodes)
   const same = new Map<string, number>()
@@ -106,11 +138,13 @@ export function buildShape(all: AriaNode[], f: Factories, nested = false): Recor
       continue
     }
     const config: Record<string, unknown> = {}
-    if (n.name !== undefined) Object.assign(config, { name: n.name, exact: typeof n.name === 'string' })
+    if (n.name !== undefined)
+      Object.assign(config, { name: n.name, exact: typeof n.name === 'string' })
     if (typeof n.attrs.level === 'number') config.level = n.attrs.level
     for (const a of BOOLEAN_ATTRS) if (a in n.attrs) config[a] = n.attrs[a]
     const make = f.role(n.role, config)
-    const pick: Def = (total.get(sig(n)) ?? 0) > 1 ? (ctx) => make(ctx).nth(idx) : make
+    const pick: Def =
+      (total.get(sig(n)) ?? 0) > 1 ? (ctx) => make(ctx).nth(idx) : make
     if (!isContainer(n)) {
       shape[key] = pick
       continue

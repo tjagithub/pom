@@ -15,3 +15,9 @@ run = "npx playwright test"
 
 [tasks.check]
 depends = ["typecheck", "test"]
+
+[tasks.lint]
+run = "npm run lint"
+
+[tasks.format]
+run = "npm run format"

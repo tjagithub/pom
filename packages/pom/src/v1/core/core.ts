@@ -19,11 +19,12 @@ export class POMGroup<T extends Record<string, Def<any>>> {
 export type POMDescriptor = POMElement | POMGroup<any>
 
 // Zod-style type inference for nested POM structures
-export type InferPOM<T> = T extends Def<infer U>
-  ? U
-  : T extends Record<string, any>
-    ? { [K in keyof T]: InferPOM<T[K]> }
-    : never
+export type InferPOM<T> =
+  T extends Def<infer U>
+    ? U
+    : T extends Record<string, any>
+      ? { [K in keyof T]: InferPOM<T[K]> }
+      : never
 
 // Reusable handler type for pom.when().do()
 export interface POMHandler {

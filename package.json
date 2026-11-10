@@ -1,16 +1,31 @@
 {
+  "name": "pompom",
+  "version": "0.1.0",
   "description": "Zod-style POM library for Playwright",
-  "devDependencies": {
-    "@biomejs/biome": "^2.4.13",
-    "@playwright/test": "^1.65.0",
-    "@types/node": "^25.6.0",
-    "playwright": "^1.65.0",
-    "tsdown": "^0.21.10",
-    "typescript": "^6.0.0",
-    "zod": "^3.0.0"
-  },
-  "author": "TJ Appleby",
+  "keywords": [
+    "e2e",
+    "page-object",
+    "playwright",
+    "pom",
+    "testing"
+  ],
+  "homepage": "https://github.com/tjagithub/pompom#readme",
   "bugs": "https://github.com/tjagithub/pompom/issues",
+  "license": "MIT",
+  "author": "TJ Appleby",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tjagithub/pompom.git"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
   "exports": {
     ".": {
       "import": {
@@ -23,42 +38,31 @@
       }
     }
   },
-  "files": [
-    "dist",
-    "README.md",
-    "LICENSE"
-  ],
-  "homepage": "https://github.com/tjagithub/pompom#readme",
-  "keywords": [
-    "playwright",
-    "pom",
-    "page-object",
-    "e2e",
-    "testing"
-  ],
-  "license": "MIT",
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.mjs",
-  "name": "pompom",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/tjagithub/pompom.git"
-  },
-  "peerDependencies": {
-    "@playwright/test": "^1.59.0"
-  },
   "scripts": {
     "build": "tsdown",
     "dev": "tsdown --watch",
     "prepublishOnly": "npm run build",
     "test": "playwright test",
     "test:ui": "playwright test --ui",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "lint": "oxlint",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check"
   },
-  "type": "module",
-  "types": "./dist/index.d.mts",
-  "version": "0.1.0",
   "dependencies": {
     "yaml": "^2.9.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.0",
+    "@types/node": "^25.6.0",
+    "oxfmt": "^0.78.0",
+    "oxlint": "^1.93.0",
+    "playwright": "^1.65.0",
+    "tsdown": "^0.21.10",
+    "typescript": "^6.0.0",
+    "zod": "^3.0.0"
+  },
+  "peerDependencies": {
+    "@playwright/test": "^1.59.0"
   }
 }
