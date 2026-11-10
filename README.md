@@ -7,9 +7,9 @@ A TypeScript library that mimics Zod's API to generate Page Object Models (POMs)
 ## Installation
 
 ```bash
-npm install pompom
+npm install @pomkit/pompom
 # or
-yarn add pompom
+yarn add @pomkit/pompom
 ```
 
 Peer dependencies (installed automatically with npm 7+):
@@ -20,7 +20,7 @@ Peer dependencies (installed automatically with npm 7+):
 POM uses a **descriptor pattern** where element factories return `Def<Locator>` functions that resolve to Playwright locators when bound to a page.
 
 ```typescript
-import { pom } from 'pompom'
+import { pom } from '@pomkit/pompom'
 
 // 1. Define your page structure
 const loginPage = pom.page({
@@ -244,7 +244,7 @@ const result = pom.from(snapshot)
 
 ```typescript
 import { test, expect } from '@playwright/test'
-import { pom } from 'pompom'
+import { pom } from '@pomkit/pompom'
 
 test('login page', async ({ page }) => {
   // Define page structure
@@ -275,7 +275,7 @@ test('login page', async ({ page }) => {
 POM is written in TypeScript and provides full type inference:
 
 ```typescript
-import type { InferPOM, Def, Ctx } from 'pom'
+import type { InferPOM, Def, Ctx } from '@pomkit/pompom'
 
 // Infer the shape of your page definition
 const pageDef = pom.page({

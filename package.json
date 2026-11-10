@@ -1,5 +1,5 @@
 {
-  "name": "pompom",
+  "name": "@pomkit/pompom",
   "version": "0.1.0",
   "description": "Zod-style POM library for Playwright",
   "keywords": [
@@ -64,5 +64,8 @@
   },
   "peerDependencies": {
     "@playwright/test": "^1.59.0"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
