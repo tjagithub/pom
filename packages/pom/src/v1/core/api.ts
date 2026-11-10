@@ -6,6 +6,7 @@ import type {
   InferPOM,
   POMHandler,
 } from './core'
+import { buildShape, parseAria } from './from-aria'
 
 // Playwright type aliases for type-safe factory functions
 type GetByRoleType = Parameters<Page['getByRole']>[0]
@@ -275,121 +276,14 @@ export const pom = {
   // === From ARIA Snapshot ===
   from(snapshot: string): Record<string, Def<any>> {
     try {
-      const lines = snapshot.split('\n')
-      const root: AriaNode = { role: 'root', children: [], indent: -1 }
-
-      for (const line of lines) {
-        if (!line.trim()) continue
-        const indent = line.search(/\S/)
-        const node = parseAriaLine(line.trim())
-
-        // Find parent: walk up to find node with indent < current indent
-        let parent = root
-        for (let i = root.children.length - 1; i >= 0; i--) {
-          const candidate = root.children[i]
-          if (candidate.indent < indent) {
-            parent = candidate
-            break
-          }
-        }
-
-        node.indent = indent
-        parent.children.push(node)
-      }
-
-      // Remove the root wrapper, return top-level children as record
-      const result: Record<string, Def<any>> = {}
-      for (const child of root.children) {
-        const key = child.name || child.role
-        result[key] = fromAriaNode(child)
-      }
-      return result
+      return buildShape(parseAria(snapshot), {
+        role: (role, config) => elemDef(role as ValidAriaRole, config as ElementConfig),
+        text: (text) => pom.text({ text }),
+      })
     } catch (error) {
       throw new Error(`Failed to parse ARIA snapshot: ${error instanceof Error ? error.message : String(error)}`)
     }
   },
-}
-
-// ARIA node representation
-interface AriaNode {
-  role: string
-  name?: string
-  url?: string
-  text?: string
-  children: AriaNode[]
-  indent: number
-}
-
-function parseAriaLine(line: string): AriaNode {
-  const node: AriaNode = { role: '', children: [], indent: 0 }
-
-  // Check for url: - /url: https://...
-  const urlMatch = line.match(/^\- \/url: (.+)$/)
-  if (urlMatch) {
-    node.role = 'link'
-    node.url = urlMatch[1]
-    return node
-  }
-
-  // Check for text: - text: Images
-  const textMatch = line.match(/^\- text: (.+)$/)
-  if (textMatch) {
-    node.role = 'text'
-    node.text = textMatch[1]
-    return node
-  }
-
-  // Check for role with name: - link "Gmail":
-  const roleNameMatch = line.match(/^\- (\w+) "([^"]+)":?$/)
-  if (roleNameMatch) {
-    node.role = roleNameMatch[1]
-    node.name = roleNameMatch[2]
-    return node
-  }
-
-  // Check for simple role: - img: or - button:
-  const simpleRole = line.match(/^\- (\w+):?$/)
-  if (simpleRole) {
-    node.role = simpleRole[1]
-    return node
-  }
-
-  return node
-}
-
-function fromAriaNode(node: AriaNode): Def<any> {
-  // Handle nodes with children (groups)
-  if (node.children.length > 0) {
-    const shape: Record<string, Def<any>> = {}
-    for (const child of node.children) {
-      const key = child.name || child.role || 'unknown'
-      shape[key] = fromAriaNode(child)
-    }
-    return pom.group(shape)
-  }
-
-  // Map ARIA roles to pom factories
-  switch (node.role) {
-    case 'button':
-      return pom.button({ name: node.name || '' })
-    case 'link':
-      return pom.link({ name: node.name || '' })
-    case 'img':
-      return pom.img({ name: node.name || '' })
-    case 'combobox':
-      return pom.combobox({ name: node.name || '' })
-    case 'search':
-      return pom.search({ name: node.name || '' })
-    case 'navigation':
-      return pom.navigation({ name: node.name || '' })
-    case 'contentinfo':
-      return pom.contentinfo({ name: node.name || '' })
-    case 'text':
-      return pom.text({ text: node.text || node.name || '' })
-    default:
-      if (node.name) return pom.text({ text: node.name })
-      return pom.locator(`[role="${node.role}"]`)
-  }
 }
 
 export type { POMParams }

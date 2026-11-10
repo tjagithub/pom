@@ -205,14 +205,22 @@ const model = await pom.page(pageDef).bind(page)
 await model['Gmail'].click()  // If "Gmail" link was in snapshot
 ```
 
-**Supported ARIA snapshot patterns:**
+The snapshot is parsed as YAML, so anything `page.ariaSnapshot()` emits is accepted.
+
+**How it maps:**
 ```
-- button "Submit"        →  pom.button({ name: 'Submit' })
-- link "Gmail":         →  pom.link({ name: 'Gmail' }) (with children)
-  - /url: https://...   →  URL is captured (for reference)
-- text: Hello World       →  pom.text('Hello World')
-- navigation:              →  pom.group({...}) (nested structure)
+- button "Submit"          →  model.Submit        (exact-name button locator)
+- heading "Hi" [level=2]   →  model.Hi            (attributes become role options)
+- link "Gmail":            →  model.Gmail         (/url and text children are ignored)
+    - /url: https://...
+- text: Hello World        →  model.text          (pom.text('Hello World'))
+- navigation:              →  model.navigation    (group scoped to the nav; `$` is the nav itself)
+    - link "Home"             model.navigation.Home
 ```
+
+- Keys are the accessible name (or the role if unnamed), cut to 40 characters.
+- Repeated names get numbered keys (`More`, `More 2`) and resolve with `.nth(i)`.
+- Children of a container are resolved inside it, so `Home` in a nav and `Home` in a footer never clash.
 
 **Example with nested groups:**
 ```typescript

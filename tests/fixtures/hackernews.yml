@@ -1,0 +1,150 @@
+- table:
+  - rowgroup:
+    - row "Hacker Newsnew | past | comments | ask | show | jobs | submit login":
+      - cell "Hacker Newsnew | past | comments | ask | show | jobs | submit login":
+        - table:
+          - rowgroup:
+            - row "Hacker Newsnew | past | comments | ask | show | jobs | submit login":
+              - cell:
+                - link:
+                  - /url: https://news.ycombinator.com
+                  - img
+              - cell "Hacker Newsnew | past | comments | ask | show | jobs | submit":
+                - link "Hacker News":
+                  - /url: news
+                - link "new":
+                  - /url: newest
+                - text: "|"
+                - link "past":
+                  - /url: front
+                - text: "|"
+                - link "comments":
+                  - /url: newcomments
+                - text: "|"
+                - link "ask":
+                  - /url: ask
+                - text: "|"
+                - link "show":
+                  - /url: show
+                - text: "|"
+                - link "jobs":
+                  - /url: jobs
+                - text: "|"
+                - link "submit":
+                  - /url: submit
+              - cell "login":
+                - link "login":
+                  - /url: login?goto=news
+    - row
+    - row:
+      - cell:
+        - table:
+          - rowgroup:
+            - row "1. upvote .name Grandfathered (neil.fraser.name)":
+              - cell "1."
+              - cell "upvote":
+                - link "upvote":
+                  - /url: vote?id=50442736&how=up&goto=news
+              - cell ".name Grandfathered (neil.fraser.name)":
+                - link ".name Grandfathered":
+                  - /url: https://neil.fraser.name/news/2026/11/10/
+                - text: (
+                - link "neil.fraser.name":
+                  - /url: from?site=neil.fraser.name
+                - text: )
+            - row "586 points by p4bl0 5 hours ago | hide | 125 comments":
+              - cell
+              - cell "586 points by p4bl0 5 hours ago | hide | 125 comments":
+                - text: 586 points by
+                - link "p4bl0":
+                  - /url: user?id=p4bl0
+                - link "5 hours ago":
+                  - /url: item?id=50442736
+                - text: "|"
+                - link "hide":
+                  - /url: hide?id=50442736&goto=news
+                - text: "|"
+                - link "125 comments":
+                  - /url: item?id=50442736
+            - row
+            - row "2. upvote Toyota brand Scion is back and it's going to sell a kei truck in America (theautopian.com)":
+              - cell "2."
+              - cell "upvote":
+                - link "upvote":
+                  - /url: vote?id=50445401&how=up&goto=news
+              - cell "Toyota brand Scion is back and it's going to sell a kei truck in America (theautopian.com)":
+                - link "Toyota brand Scion is back and it's going to sell a kei truck in America":
+                  - /url: https://www.theautopian.com/scion-is-back-and-its-going-to-sell-a-freaking-kei-truck-in-america/
+                - text: (
+                - link "theautopian.com":
+                  - /url: from?site=theautopian.com
+                - text: )
+            - row "130 points by NaOH 2 hours ago | hide | 90 comments":
+              - cell
+              - cell "130 points by NaOH 2 hours ago | hide | 90 comments":
+                - text: 130 points by
+                - link "NaOH":
+                  - /url: user?id=NaOH
+                - link "2 hours ago":
+                  - /url: item?id=50445401
+                - text: "|"
+                - link "hide":
+                  - /url: hide?id=50445401&goto=news
+                - text: "|"
+                - link "90 comments":
+                  - /url: item?id=50445401
+            - row
+            - row "3. upvote Smart home devices should work without the internet (docodethatmatters.com)":
+              - cell "3."
+              - cell "upvote":
+                - link "upvote":
+                  - /url: vote?id=50441707&how=up&goto=news
+              - cell "Smart home devices should work without the internet (docodethatmatters.com)":
+                - link "Smart home devices should work without the internet":
+                  - /url: https://docodethatmatters.com/home-automation-overnight-success/
+                - text: (
+                - link "docodethatmatters.com":
+                  - /url: from?site=docodethatmatters.com
+                - text: )
+            - row "583 points by skittleson 7 hours ago | hide | 205 comments":
+              - cell
+              - cell "583 points by skittleson 7 hours ago | hide | 205 comments":
+                - text: 583 points by
+                - link "skittleson":
+                  - /url: user?id=skittleson
+                - link "7 hours ago":
+                  - /url: item?id=50441707
+                - text: "|"
+                - link "hide":
+                  - /url: hide?id=50441707&goto=news
+                - text: "|"
+                - link "205 comments":
+                  - /url: item?id=50441707
+            - row
+            - row "4. upvote Six Math Essentials by Terence Tao (teorth.github.io)":
+              - cell "4."
+              - cell "upvote":
+                - link "upvote":
+                  - /url: vote?id=50446246&how=up&goto=news
+              - cell "Six Math Essentials by Terence Tao (teorth.github.io)":
+                - link "Six Math Essentials by Terence Tao":
+                  - /url: https://teorth.github.io/tao-web/six-math-essentials.html
+                - text: (
+                - link "teorth.github.io":
+                  - /url: from?site=teorth.github.io
+                - text: )
+            - row "52 points by digital55 1 hour ago | hide | 5 comments":
+              - cell
+              - cell "52 points by digital55 1 hour ago | hide | 5 comments":
+                - text: 52 points by
+                - link "digital55":
+                  - /url: user?id=digital55
+                - link "1 hour ago":
+                  - /url: item?id=50446246
+                - text: "|"
+                - link "hide":
+                  - /url: hide?id=50446246&goto=news
+                - text: "|"
+                - link "5 comments":
+                  - /url: item?id=50446246
+            - row
