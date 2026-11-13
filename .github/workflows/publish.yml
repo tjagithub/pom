@@ -1,0 +1,85 @@
+name: Publish
+
+# Publishes to npm when a PR labelled `publish` is merged into main.
+# Auth uses npm trusted publishing (OIDC), so no NPM_TOKEN secret is needed.
+on:
+  push:
+    branches: [main]
+
+permissions: {}
+
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+jobs:
+  check-label:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      publish: ${{ steps.label.outputs.publish }}
+    steps:
+      - name: Look for the publish label on the merged PR
+        id: label
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
+        run: |
+          labels=$(gh api "repos/$REPO/commits/$SHA/pulls" --jq '[.[].labels[].name] | join(",")')
+          echo "PR labels: ${labels:-none}"
+          if [[ ",$labels," == *",publish,"* ]]; then
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  publish:
+    needs: check-label
+    if: needs.check-label.outputs.publish == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: npm
+    permissions:
+      contents: write # create the GitHub release and tag
+      id-token: write # npm trusted publishing and provenance
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: jdx/mise-action@d5574b52816a478f9d4e6529a3f6ff17a8a36785 # v5.2.8
+        with:
+          install_args: node
+          cache: false
+
+      - name: Read version
+        id: version
+        run: echo "version=$(node -p 'require("./package.json").version')" >> "$GITHUB_OUTPUT"
+
+      - name: Fail if this version is already on npm
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          name=$(node -p 'require("./package.json").name')
+          if npm view "$name@$VERSION" version >/dev/null 2>&1; then
+            echo "::error::$name@$VERSION is already published. Bump the version in the PR."
+            exit 1
+          fi
+
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test
+
+      - name: Publish to npm
+        run: npm publish
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+          SHA: ${{ github.sha }}
+        run: gh release create "v$VERSION" --target "$SHA" --title "v$VERSION" --generate-notes
