@@ -1,6 +1,6 @@
 {
   "name": "@pomkit/pompom",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Zod-style POM library for Playwright",
   "keywords": [
     "e2e",
@@ -44,7 +44,7 @@
     "prepublishOnly": "npm run build",
     "test": "playwright test",
     "test:ui": "playwright test --ui",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && tsc -p tests",
     "lint": "oxlint",
     "format": "oxfmt",
     "format:check": "oxfmt --check"

@@ -13,7 +13,16 @@ yarn add @pomkit/pompom
 ```
 
 Peer dependencies (installed automatically with npm 7+):
+
 - `@playwright/test: ^1.59.0`
+
+### Agent skill
+
+To teach your coding agent (Claude Code, Cursor, Codex and others) the pompom API:
+
+```bash
+npx skills add tjagithub/pompom
+```
 
 ## Core Concept
 
@@ -24,8 +33,8 @@ import { pom } from '@pomkit/pompom'
 
 // 1. Define your page structure
 const loginPage = pom.page({
-  username: pom.textbox({ label: 'Username' }),
-  password: pom.textbox({ label: 'Password' }),
+  username: pom.textbox({ name: 'Username' }),
+  password: pom.textbox({ name: 'Password' }),
   submit: pom.button({ name: 'Submit' }),
 })
 
@@ -48,13 +57,13 @@ Defines a page object. Returns an object with a `bind()` method.
 const pageDef = pom.page({
   // Element locators
   submit: pom.button({ name: 'Submit' }),
-  
+
   // Logical groups (nested structures)
   form: pom.group({
-    username: pom.textbox({ label: 'Username' }),
-    password: pom.textbox({ label: 'Password' }),
+    username: pom.textbox({ name: 'Username' }),
+    password: pom.textbox({ name: 'Password' }),
   }),
-  
+
   // Reusable handlers
   handles: [myHandler],
 })
@@ -72,7 +81,7 @@ All factories return `Def<Locator>` and support multiple locator strategies:
 ```typescript
 // Basic usage
 pom.button({ name: 'Submit' })
-pom.textbox({ label: 'Email' })
+pom.textbox({ name: 'Email' })
 pom.link({ name: 'Click here' })
 pom.checkbox({ name: 'Agree' })
 
@@ -95,15 +104,14 @@ pom.button({ name: 'Submit' })
 #### CSS Selector & Other Locators
 
 ```typescript
-// CSS selector with options
+// CSS selector
 pom.locator('.my-class')
-pom.locator('.item', { hasText: 'Item 1' })
 
 // Test ID
 pom.testId('submit-btn')
 
-// Text with exact option
-pom.text('Hello World')
+// Text, with optional exact match
+pom.text({ text: 'Hello World' })
 pom.text({ text: 'Hello', exact: true })
 
 // Direct role access (ARIA group role - renamed to avoid conflict)
@@ -117,8 +125,8 @@ Creates logical groupings of elements (not an ARIA role):
 ```typescript
 const pageDef = pom.page({
   form: pom.group({
-    username: pom.textbox({ label: 'Username' }),
-    password: pom.textbox({ label: 'Password' }),
+    username: pom.textbox({ name: 'Username' }),
+    password: pom.textbox({ name: 'Password' }),
   }),
   submit: pom.button({ name: 'Submit' }),
 })
@@ -133,22 +141,19 @@ await model.submit.click()
 
 ### `pom.within(parent, child) => Def<Locator>`
 
-Scopes a child locator to a parent (equivalent to Playwright's `filter({ has })`):
+Resolves the child inside the parent and returns the child locator. This is a descendant lookup, not `filter({ has })`:
 
 ```typescript
-// Equivalent to: page.locator('section').filter({ has: page.getByRole('button', { name: 'Click me' }) })
+// Equivalent to: page.locator('section').getByRole('button', { name: 'Click me' })
 const scopedButton = pom.within(
   pom.locator('section'),
-  pom.button({ name: 'Click me' })
+  pom.button({ name: 'Click me' }),
 )
 
-// Scope elements inside a form
-// Equivalent to: page.getByRole('form', { name: 'login' }).filter({
-//   has: page.getByRole('button', { name: 'submit' }) 
-// })
+// Equivalent to: page.getByRole('form', { name: 'login' }).getByRole('button', { name: 'submit' })
 const submitInForm = pom.within(
   pom.form({ name: 'login' }),
-  pom.button({ name: 'submit' })
+  pom.button({ name: 'submit' }),
 )
 ```
 
@@ -160,13 +165,13 @@ Combine locators (delegates to Playwright's `.and()` and `.or()`):
 // AND: Matches elements matching BOTH locators
 const specificButton = pom.and(
   pom.button({ name: 'Subscribe' }),
-  pom.locator('button[title="Newsletter"]')
+  pom.locator('button[title="Newsletter"]'),
 )
 
 // OR: Matches elements matching ONE or BOTH locators
 const emailButton = pom.or(
   pom.button({ name: 'New email' }),
-  pom.button({ name: 'Compose' })
+  pom.button({ name: 'Compose' }),
 )
 ```
 
@@ -176,7 +181,8 @@ Creates reusable handlers for `page.addLocatorHandler()`:
 
 ```typescript
 // Define a reusable handler
-const dismissNewsletter = pom.when(pom.text('Sign up to the newsletter'))
+const dismissNewsletter = pom
+  .when(pom.text({ text: 'Sign up to the newsletter' }))
   .do(pom.click(pom.button({ name: 'No thanks' })))
 
 // Use in page definitions - handlers auto-register on bind()
@@ -191,6 +197,8 @@ const dashboardPage = pom.page({ handles: [dismissNewsletter] })
 
 **How it works:** When `pageDef.bind(page)` is called, all handlers in `handles` array are registered via `page.addLocatorHandler()`. They automatically run when the trigger locator appears.
 
+The action resolves inside the trigger locator, so the button it clicks must be a descendant of the trigger. Use the overlay container (for example `pom.dialog('Newsletter')`) as the trigger, not a text node beside the button. Each `bind()` call registers the handlers again.
+
 ### `pom.from(snapshot) => Record<string, Def<any>>`
 
 Parses Playwright's ARIA snapshot text and generates a POM structure automatically:
@@ -204,18 +212,19 @@ const pageDef = pom.from(snapshot)
 
 // Bind and use
 const model = await pom.page(pageDef).bind(page)
-await model['Gmail'].click()  // If "Gmail" link was in snapshot
+await model['Gmail'].click() // If "Gmail" link was in snapshot
 ```
 
 The snapshot is parsed as YAML, so anything `page.ariaSnapshot()` emits is accepted.
 
 **How it maps:**
+
 ```
 - button "Submit"          →  model.Submit        (exact-name button locator)
 - heading "Hi" [level=2]   →  model.Hi            (attributes become role options)
 - link "Gmail":            →  model.Gmail         (/url and text children are ignored)
     - /url: https://...
-- text: Hello World        →  model.text          (pom.text('Hello World'))
+- text: Hello World        →  model.text          (pom.text({ text: 'Hello World' }))
 - navigation:              →  model.navigation    (group scoped to the nav; `$` is the nav itself)
     - link "Home"             model.navigation.Home
 ```
@@ -225,6 +234,7 @@ The snapshot is parsed as YAML, so anything `page.ariaSnapshot()` emits is accep
 - Children of a container are resolved inside it, so `Home` in a nav and `Home` in a footer never clash.
 
 **Example with nested groups:**
+
 ```typescript
 const snapshot = `
 - navigation:
@@ -250,8 +260,8 @@ test('login page', async ({ page }) => {
   // Define page structure
   const loginPage = pom.page({
     form: pom.group({
-      username: pom.textbox({ label: 'Username' }),
-      password: pom.textbox({ label: 'Password' }),
+      username: pom.textbox({ name: 'Username' }),
+      password: pom.textbox({ name: 'Password' }),
     }),
     submit: pom.button({ name: 'Login' }),
     forgotPassword: pom.link({ name: 'Forgot password?' }),
@@ -281,7 +291,7 @@ import type { InferPOM, Def, Ctx } from '@pomkit/pompom'
 const pageDef = pom.page({
   submit: pom.button({ name: 'Submit' }),
   form: pom.group({
-    username: pom.textbox({ label: 'User' }),
+    username: pom.textbox({ name: 'User' }),
   }),
 })
 
@@ -316,13 +326,13 @@ Tooling is pinned in `mise.toml`. With [mise](https://mise.jdx.dev) installed, `
 
 ## Key Differences from Traditional POM
 
-| Traditional POM | POM Library |
-|----------------|--------------|
-| Class-based, manual locator creation | Zod-style declarative API |
-| Locators created in constructor | Deferred resolution with `.bind()` |
-| No reuse of handlers | `pom.when().do()` for reusable handlers |
-| Manual ARIA snapshot parsing | `pom.from()` auto-parses snapshots |
-| Limited type inference | Full TypeScript type inference |
+| Traditional POM                      | POM Library                             |
+| ------------------------------------ | --------------------------------------- |
+| Class-based, manual locator creation | Zod-style declarative API               |
+| Locators created in constructor      | Deferred resolution with `.bind()`      |
+| No reuse of handlers                 | `pom.when().do()` for reusable handlers |
+| Manual ARIA snapshot parsing         | `pom.from()` auto-parses snapshots      |
+| Limited type inference               | Full TypeScript type inference          |
 
 ## License
 
